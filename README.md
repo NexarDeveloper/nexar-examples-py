@@ -23,7 +23,7 @@ and then calling the get_token function with the required credentials (see the R
 All tokens are time limited (typically for 24 hours) and new tokens will be needed after expiration.
 
 ## Nexar queries
-All Nexar queries are baesed on the GraphQL query language.  The examples in this repository typically begin by defining a query string and then calling a Nexar client with that string and some variable definitions to target the query to a specific dataset.  For more information about the GraphQL language please visit https://graphql.org.  For information about the structure of the Nexar schema please visit https://api.nexar.com/ui/voyager.
+All Nexar queries are based on the GraphQL query language.  The examples in this repository typically begin by defining a query string and then calling a Nexar client with that string and some variable definitions to target the query to a specific dataset.  For more information about the GraphQL language please visit https://graphql.org.  For information about the structure of the Nexar schema please visit https://api.nexar.com/ui/voyager.
 
 ## A simple part search
 The mpn_info.py example queries for information related to a manufacturers part number (MPN):
