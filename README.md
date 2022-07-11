@@ -93,3 +93,19 @@ The project_BOM.py example is a query that uses the project id to identify the B
 `python workspace_info.py -t $token <project_id>`
 
 The project id is static across Nexar sessions and contains all of the information needed to identify the correct workspace and design data.  This example is important to inspect to understand how the Nexar query can be used to get design information from either the current version of the design (labeled workInProgress in our schema) or from a specific version labeled for a release.  Additionally, each design may contain variants that will be a unique configuration of the design components.
+
+## Supply token caching
+
+The supply_token_caching_script.py example uses multiple manufacturer part numbers (MPN) in a single query, to retrieve information about specific parts, similar to mpn_pricing_to_csv.py, however it will cache the access token in a file called tokenCache.json. In this case, caching in a file is more useful than caching in memory,  because the script is not a long-lived application but it could still be run many times in one day. Using a cached access token reduces the burden on Nexar servers.
+
+`python supply_token_caching_script.py <mpn> <second mpn> <third mpn> ...`
+
+During execution, the program checks for a json file containing an access token with an expiry time. If this doesn't exist, it will create the json file for this. This json file will cache the access token and expiry time. This will be valid for a set time. Then is makes a query using the access token and returns the query and the script ends. Once the script is executed again, it will check if the json file exists. If it does exists, instead of requesting another token, it will compare the expiry time of the access token with the current time. If it has not passed the expiry time, the access token is reused. If it has passed the expiry time, the access token is invalid and another access token is created and cached in the json file with its expiry time, overwriting the previous access token stored in the json file as well as the expiry time. The query results are then processed into a csv output meant to display a table of distributors and prices for each mpn.
+
+### Requirements:
+requests
+
+A `NEXAR_CLIENT_ID` and `NEXAR_CLIENT_SECRET` environment variables are needed to be set in system properties as they are needed to run the script.
+
+
+
