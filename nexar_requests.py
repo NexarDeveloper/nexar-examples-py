@@ -13,11 +13,11 @@ class NexarClient:
         self.s.headers.update({"token": token})
         self.s.keep_alive = False
 
-    def get_query(self, query: str, variables: Dict) -> dict:
+    def get_query(self, query: str, variables: Dict = {}, nexar_url: str = NEXAR_URL) -> dict:
         """Return Nexar response for the query."""
         try:
             r = self.s.post(
-                NEXAR_URL,
+                nexar_url,
                 json={"query": query, "variables": variables},
             )
 

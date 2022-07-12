@@ -108,4 +108,13 @@ requests
 A `NEXAR_CLIENT_ID` and `NEXAR_CLIENT_SECRET` environment variables are needed to be set in system properties as they are needed to run the script.
 
 
+## Regionalization 
+
+The design_regionalization.py example uses multiple queries that initially takes the user token as an input for the first query, then a second query takes another user input to choose a Nexar server that is located geographically close to an Altium 365 workspace.
+
+`python design_regionalization.py`
+
+Once the script is executed, it will request an input for the token to make requests to the API. Once the token is provided, the query returns the name of the location and the Url. It will then display each possible location with an index as well as an input prompt. The user then needs to input the index assigned to the location they want to request to. The purpose of this part of the script is to reduce latency (faster queries). After the user provides an index value, the script sends the second query to the location chosen by the user.
+
+
 
