@@ -117,4 +117,10 @@ The design_regionalization.py example uses multiple queries that initially takes
 Once the script is executed, it will request an input for the token to make requests to the API. Once the token is provided, the query returns the name of the location and the Url. It will then display each possible location with an index as well as an input prompt. The user then needs to input the index assigned to the location they want to request to. The purpose of this part of the script is to reduce latency (faster queries). After the user provides an index value, the script sends the second query to the location chosen by the user.
 
 
+## Comments
 
+The project_comments.py example uses multiple queries that requests a token as an input, as well as a project from the user. It will then return all comments from that project, the title of the project and the username of who created the comment.
+
+`python project_comments.py`
+
+When the script is executed, it will request an input for the token to make requests to the API. After the token is provided, the first query returns all available workspaces. The script chooses the first workspace in the list. It will then take the workspace URL and use that in the second query, which lists all projects in that workspace with an index value next to it. This allows the user to type in the index value of which project they wish to view, rather than typing in the workspace. When an index value is passed into the script, the third query will print all comments in that project with the comment thread number and the username of who created the comment.
