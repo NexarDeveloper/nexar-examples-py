@@ -124,3 +124,14 @@ The project_comments.py example uses multiple queries that requests a token as a
 `python project_comments.py`
 
 When the script is executed, it will request an input for the token to make requests to the API. After the token is provided, the first query returns all available workspaces. The script chooses the first workspace in the list. It will then take the workspace URL and use that in the second query, which lists all projects in that workspace with an index value next to it. This allows the user to type in the index value of which project they wish to view, rather than typing in the workspace. When an index value is passed into the script, the third query will print all comments in that project with the comment thread number and the username of who created the comment.
+
+## Changing Comments
+
+The project_change_comments.py example is similar to the project_comments.py example, however after returning all the comments for a particular project, it will allow the user to update, create or delete a comment within the project that you chose.
+
+`python project_change_comments.py`
+
+When the script is executed, it will run exactly the same as project_comments.py, however, after displaying all of the comments, it will then ask the user to input 1, 2 or 3 which correspond to update, create or delete a comment. 
+If the user chooses 1, which is update, it will then ask the user to input the comment ID of the comment they want to alter. Then it will ask the user to input text of what they want the comment to say. The script will then get the comment thread ID that the comment ID is in and run a mutation which will update the comment to display the text they have entered. 
+If the user chose 2, which is create a comment, the user is required to enter the comment thread ID of which section they want to add a comment to as well as the text they want the comment to say. Then the script will run a mutation to create a comment in the comment thread ID location the user entered with the text they entered. 
+If the user chose 3, they will be asked to enter the comment ID for the comment they want to delete. The script will then get the comment thread ID that the comment ID is in, then run a mutation to delete the comment. 
