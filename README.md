@@ -116,23 +116,28 @@ The design_regionalization.py example uses multiple queries that initially takes
 
 Once the script is executed, it will request an input for the token to make requests to the API. Once the token is provided, the query returns the name of the location and the Url. It will then display each possible location with an index as well as an input prompt. The user then needs to input the index assigned to the location they want to request to. The purpose of this part of the script is to reduce latency (faster queries). After the user provides an index value, the script sends the second query to the location chosen by the user.
 
+## Design helper
+
+The design_helpers.py script queries the workspaces available and gets the users choice of workspace, as well as querying the projects in the workspace and gets the users choice of project they want to use. 
+
+This script cant be executed by itself as it holds only functions and queries. The purpose of this script is to be used as an addition to any script that queries the design API, as most scripts will need to get the workspace and project the user wants to use. 
 
 ## Comments
 
-The project_comments.py example uses multiple queries that requests a token as an input, as well as a project from the user. It will then return all comments from that project, the title of the project and the username of who created the comment.
+The project_comments.py example uses multiple queries that requests a token as an input, as well as a workspace and project from the user. It will then return all comments from that project.
 
 `python project_comments.py`
 
-When the script is executed, it will request an input for the token to make requests to the API. After the token is provided, the first query returns all available workspaces. The script chooses the first workspace in the list. It will then take the workspace URL and use that in the second query, which lists all projects in that workspace with an index value next to it. This allows the user to type in the index value of which project they wish to view, rather than typing in the workspace. When an index value is passed into the script, the third query will print all comments in that project with the comment thread number and the username of who created the comment.
+When the script is executed, it will request an input for the token to make requests to the API. After the token is provided, the first query returns all available workspaces. The user then needs to pick the workspace they want to request to. It will then take the workspace URL for the workspace the user chose and use that in the second query, which lists all projects in that workspace with an index value next to it. This allows the user to type in the index value of which project they wish to view, rather than typing in the workspace. When an index value is passed into the script, the third query will print all comments in that project with the comment thread number, comment thread ID, comment ID, the username of who created the comment, and the text in the comment.
 
 ## Changing Comments
 
-The project_change_comments.py example is similar to the project_comments.py example, however after returning all the comments for a particular project, it will allow the user to update, create or delete a comment within the project that you chose.
+The project_change_comments.py example is similar to the project_comments.py example, however after returning all the comments for a particular project, it will allow the user to update, create or delete a comment within the project that they chose.
 
 `python project_change_comments.py`
 
 When the script is executed, it will run exactly the same as project_comments.py, however, after displaying all of the comments, it will then ask the user to input 1, 2 or 3 which correspond to update, create or delete a comment. 
-If the user chooses 1, which is update, it will then ask the user to input the comment ID of the comment they want to alter. Then it will ask the user to input text of what they want the comment to say. The script will then get the comment thread ID that the comment ID is in and run a mutation which will update the comment to display the text they have entered. 
+If the user chose 1, which is update, it will then ask the user to input the comment ID of the comment they want to alter. Then it will ask the user to input text of what they want the comment to say. The script will then get the comment thread ID that the comment ID is in and run a mutation which will update the comment to display the text they have entered. 
 If the user chose 2, which is create a comment, the user is required to enter the comment thread ID of which section they want to add a comment to as well as the text they want the comment to say. Then the script will run a mutation to create a comment in the comment thread ID location the user entered with the text they entered. 
 If the user chose 3, they will be asked to enter the comment ID for the comment they want to delete. The script will then get the comment thread ID that the comment ID is in, then run a mutation to delete the comment. 
 
@@ -143,3 +148,14 @@ The project_design_components.py example uses multiple queries that takes a toke
 `python project_design_components.py`
 
 When this script is executed, it will first ask the user to input a token. It will then use this token to query to the API all available workspaces and return them in a list to the user with an index value. The user will then choose a workspace by selecting the index value next to the workspace. If they choose a workspace that is not listed, the script will loop until a valid workspaces is chosen. Once a valid workspace is chosen, the script will use this workspace to query to the API all available projects in this workspace. It will then display all available projects with an index value. The user then needs to choose a project by selecting the index value next to the project they want to retrieve information from. If an invalid project is chosen, the script will loop until a valid project is chosen. After a valid project is chosen, the project ID is used to query the API to retrieve the first 25 components used in the project, along with its designator, name, comment, and description. If a component also has parameters, it will also display the parameters name and value. In this particular example, only the first variant is used so the query will only return information about the first variant.
+
+## Design paging
+
+The design_paging.py example queries the design API for components used in a project chosen by the user. It will then print a limited amount of components in pages. 
+
+`python design_paging.py`
+
+When the script is executed, it will print all available workspaces. Then the user will need to choose which workspace they want to use. This is then repeated for projects. After the user has chosen the workspace and project, a list of components in the project are printed in pages. The page size is set to four, but can be changed, so the list printed is four long. The script will then allow the user to pick either next page, previous page or exit by selecting the number assigned next to the choices. 
+If the user chooses 1, which is next page, the script will print the next four components. However, if the user chooses next page when there are no more components to print, it will ask the user to choose a different option. 
+If the user chooses 2, which is previous page, the script will print the previous four components. If there is no previous page, the user is asked to input a different option. 
+If the user chooses 3, which is exit, the script will stop. 

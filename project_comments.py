@@ -1,24 +1,11 @@
 from nexar_requests import NexarClient
-
-WORKSPACES_QUERY = '''
-query Workspaces{
-    desWorkspaces{
-        id
-    }
-}
-'''
-WORKSPACEBYID_QUERY = '''
-query WorkspaceById($workspaceId: ID!) {
-    desWorkspaceById(
-    id: $workspaceId
-    ) {
-        projects{
-            id
-            name
-        }
-    }
-}
-'''
+import sys
+from design_helpers import (
+    get_workspaces,
+    get_workspace_id_from_user,
+    get_projects,
+    get_project_id_from_user
+)
 
 PROJECTWITHCOMMENTS_QUERY = '''
 query desProjectById($projectId : ID!) {
@@ -31,7 +18,12 @@ query desProjectById($projectId : ID!) {
                     pcb{
                         commentThreads{
                             threadNumber
+                            commentThreadId
+                            modifiedBy{
+                                userName
+                            }
                             comments{
+                                commentId
                                 text
                                 createdBy{
                                     userName
@@ -46,45 +38,40 @@ query desProjectById($projectId : ID!) {
 }
 '''
 
-def get_projects(nexar):
-    workspaces = nexar.get_query(WORKSPACES_QUERY)["desWorkspaces"]
+def get_comment_threads_from_project(project_id, nexar):
     variables = {
-        "workspaceId": workspaces[0]["id"]
+        "projectId": project_id
     }
-    projects = nexar.get_query(WORKSPACEBYID_QUERY, variables)["desWorkspaceById"]["projects"]
-    return projects
+    commentThreads = nexar.get_query(PROJECTWITHCOMMENTS_QUERY, variables)["desProjectById"]["design"]["workInProgress"]["variants"][0]["pcb"]["commentThreads"]
+    return commentThreads
 
-def get_project_id_from_user(projects):
+def list_comment_threads(commentThreads):
     print()
-    for index, project in enumerate(projects):
-        print(index + 1, ": ", project["name"])
-    option = input("\n" + "Enter number for project to visit... : ")
-    option = int(option)
-    if option <= 0 or option > len(projects):
-        print("\n" + "Invalid response, try again... " + "\n")
-        get_project_id_from_user(projects)
-    else:
-        return projects[option-1]["id"]
-
-def list_comment_threads_for_project(projects, nexar):
-        variables = {
-        "projectId": projects
-        }
-        commentThreads = nexar.get_query(PROJECTWITHCOMMENTS_QUERY, variables)["desProjectById"]["design"]["workInProgress"]["variants"][0]["pcb"]["commentThreads"]
+   
+    if commentThreads == []:
+        print("No comments available, exiting...")
         print()
-        if commentThreads == []:
-            print("No comments available")
+        sys.exit()
+    
+    for thread in commentThreads:
+        print("Comment thread :", thread["threadNumber"])
+        print("Commend thread ID : ", thread["commentThreadId"])
+        
+        for comment in thread["comments"]:
+            print("Comment ID :", comment["commentId"])
+            print("Created by :", comment["createdBy"]["userName"])
+            print("Text :", comment["text"])
             print()
-        for thread in commentThreads:
-            print("Comment thread", thread["threadNumber"], ":")
-            for comment in thread["comments"]:
-                print("Created by :", comment["createdBy"]["userName"])
-                print(comment["text"])
-                print()
 
 if __name__ == '__main__':
     token = input("Enter token : ")
     nexar = NexarClient(token)
-    projects = get_projects(nexar)
+
+    workspaces = get_workspaces(nexar)
+    workspace_id = get_workspace_id_from_user(workspaces)
+
+    projects = get_projects(workspace_id, nexar)
     project_id = get_project_id_from_user(projects)
-    list_comment_threads_for_project(project_id, nexar)
+
+    commentThreads = get_comment_threads_from_project(project_id, nexar)
+    list_comment_threads(commentThreads)
