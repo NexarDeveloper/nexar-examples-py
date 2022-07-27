@@ -159,3 +159,11 @@ When the script is executed, it will print all available workspaces. Then the us
 If the user chooses 1, which is next page, the script will print the next four components. However, if the user chooses next page when there are no more components to print, it will ask the user to choose a different option. 
 If the user chooses 2, which is previous page, the script will print the previous four components. If there is no previous page, the user is asked to input a different option. 
 If the user chooses 3, which is exit, the script will stop. 
+
+## Supply paging
+
+The supply_paging.py example queries the supply API for all available parts. It will then display those parts in pages in limited amounts. The user can then change which page they are viewing. 
+
+`python supply_paging.py`
+
+When the script is executed, the user is asked for a token input. Then the user is asked to enter a part MPN. This part MPN doesn't need to be an exact MPN as it is used to search through the database to find similar MPNs. The MPN and token is then used to query the supply API. The name entered is searched for and the query returns all possible part results that are similar to the name the user entered. However, the number of matched parts may be very large, so the results are limited to 10 at a time. Then the script is similar to design paging. It will ask the user to choose next page, previous page or exit to change the page of results displayed or exit the program. However, this script has a fourth option, the user is able to choose a page to visit, rather then choosing next page until they reach the page they want to visit. This option will request the user to input a page they want to visit. If this page doesn't exist or the number they choose is out of range, it will return invalid page number. If the page does exist, it will query the Supply API from the page number.
