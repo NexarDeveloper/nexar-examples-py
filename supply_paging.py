@@ -101,11 +101,10 @@ def get_page_decision_from_user():
     print()
     userPageDecision = input("Enter number for page to visit... : ")
     userPageDecision = int(userPageDecision)
-    print()
 
     if userPageDecision <= 0 or userPageDecision > len(PAGE_OPTIONS):
-        print("\n" + "Invalid response, try again... ")
-        get_page_decision_from_user()
+        print("\n" + "Invalid response, try again... " + "\n")
+        return get_page_decision_from_user()
     
     else:
         return PAGE_OPTIONS[userPageDecision - 1]
@@ -126,7 +125,7 @@ def move_page(userDecision, numberOfPages, limit, inStockOnly, part, start, page
             list_supsearch_query(partInformation, page, numberOfPages)
 
         else:
-            print("\n" + "No next page available, try again...")
+            print("\n" + "No next page available, try again..." + "\n")
         
         return page, start
     
@@ -141,7 +140,7 @@ def move_page(userDecision, numberOfPages, limit, inStockOnly, part, start, page
             list_supsearch_query(partInformation, page, numberOfPages)
 
         else:
-            print("\n" + "No previous page available, try again...")
+            print("\n" + "No previous page available, try again..." + "\n")
             
         return page, start
    

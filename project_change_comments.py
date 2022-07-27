@@ -124,7 +124,7 @@ def get_user_decision(commentThreads):
    
     if choice <= 0 or choice > len(COMMENT_ACTIONS):
         print("Invalid response, try again... " + "\n")
-        get_user_decision(commentThreads)
+        return get_user_decision(commentThreads)
     
     return COMMENT_ACTIONS[choice-1]
 
