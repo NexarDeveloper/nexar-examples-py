@@ -134,7 +134,7 @@ def get_page_decision_from_user():
 
     if userPageDecision <= 0 or userPageDecision > len(PAGE_OPTIONS):
         print("\n" + "Invalid response, try again... ")
-        get_page_decision_from_user()
+        return get_page_decision_from_user()
     else:
         return PAGE_OPTIONS[userPageDecision - 1]
 

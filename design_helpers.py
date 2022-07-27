@@ -38,7 +38,7 @@ def get_workspace_id_from_user(workspaces: list):
 
     if chosenWorkspace <= 0 or chosenWorkspace > len(workspaces):
         print("\n" + "Invalid response, try again... ")
-        get_workspace_id_from_user(workspaces)
+        return get_workspace_id_from_user(workspaces)
     else:
         return workspaces[chosenWorkspace-1]["id"]
 
@@ -65,6 +65,6 @@ def get_project_id_from_user(projects: list):
 
     if chosenProject <= 0 or chosenProject > len(projects):
         print("\n" + "Invalid response, try again... ")
-        get_project_id_from_user(projects)
+        return get_project_id_from_user(projects)
     else:
         return projects[chosenProject-1]["id"]
