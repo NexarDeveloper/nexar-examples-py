@@ -68,30 +68,28 @@ def list_supsearch_query(partInformation, page, numberOfPages):
             print("There are currently", partInformation["hits"], "parts available...")
             
             for part in partInformation["results"]:
+                print()
+                print("Part name :", part["part"]["name"])
                 
-                if part != []:
-                    print()
-                    print("Part name :", part["part"]["name"])
-                    
-                    if part["part"]["category"] != None:
-                        print("Part category :", part["part"]["category"]["name"])
-                    else:
-                        print("No part category available")
+                if part["part"]["category"] != None:
+                    print("Part category :", part["part"]["category"]["name"])
+                else:
+                    print("No part category available")
 
-                    print("Part manufacturer :", part["part"]["manufacturer"]["name"])
-                    print("Part MPN :", part["part"]["mpn"])
-                    print("Average number of parts available :", part["part"]["avgAvail"])
-                    print("Description :", part["part"]["shortDescription"])
-                    
-                    if part["part"]["medianPrice1000"] != None:
-                        print("Part median price :", part["part"]["medianPrice1000"]["price"])
-                        print("Currency :", part["part"]["medianPrice1000"]["currency"])
-                   
-                    else:
-                        print("No pricing available...")
+                print("Part manufacturer :", part["part"]["manufacturer"]["name"])
+                print("Part MPN :", part["part"]["mpn"])
+                print("Average number of parts available :", part["part"]["avgAvail"])
+                print("Description :", part["part"]["shortDescription"])
+                
+                if part["part"]["medianPrice1000"] != None:
+                    print("Part median price :", part["part"]["medianPrice1000"]["price"])
+                    print("Currency :", part["part"]["medianPrice1000"]["currency"])
+                
+                else:
+                    print("No pricing available...")
 
         else:
-            print("No parts that have that name are available... ")
+            print("No parts available... ")
     print()
 
 def get_page_decision_from_user():
