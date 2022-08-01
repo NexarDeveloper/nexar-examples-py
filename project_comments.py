@@ -23,11 +23,16 @@ query desProjectById($projectId : ID!) {
                                 userName
                             }
                             comments{
+                                createdAt
                                 commentId
                                 text
                                 createdBy{
                                     userName
                                 }
+                                modifiedBy{
+                                    userName
+                                }
+                                modifiedAt
                             }
                         }
                     }
@@ -55,12 +60,18 @@ def list_comment_threads(commentThreads):
     
     for thread in commentThreads:
         print("Comment thread :", thread["threadNumber"])
-        print("Commend thread ID : ", thread["commentThreadId"])
+        print("Commend thread ID :", thread["commentThreadId"])
         
         for comment in thread["comments"]:
             print("Comment ID :", comment["commentId"])
             print("Created by :", comment["createdBy"]["userName"])
+            print("Created at :", comment["createdAt"])
             print("Text :", comment["text"])
+            
+            if comment["createdAt"] != comment["modifiedAt"]:
+                print("Modified by :", comment["modifiedBy"]["userName"])
+                print("Modified at :", comment["modifiedAt"])
+            
             print()
 
 if __name__ == '__main__':

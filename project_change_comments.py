@@ -25,15 +25,17 @@ query desProjectById($projectId : ID!) {
                         commentThreads{
                             threadNumber
                             commentThreadId
-                            modifiedBy{
-                                userName
-                            }
                             comments{
                                 commentId
                                 text
                                 createdBy{
                                     userName
                                 }
+                                modifiedBy{
+                                    userName
+                                }
+                                modifiedAt
+                                createdAt
                             }
                         }
                     }
@@ -101,12 +103,18 @@ def list_comment_threads(commentThreads):
     
     for thread in commentThreads:
         print("Comment thread :", thread["threadNumber"])
-        print("Commend thread ID : ", thread["commentThreadId"])
+        print("Commend thread ID :", thread["commentThreadId"])
         
         for comment in thread["comments"]:
             print("Comment ID :", comment["commentId"])
             print("Created by :", comment["createdBy"]["userName"])
+            print("Created at :", comment["createdAt"])
             print("Text :", comment["text"])
+
+            if comment["createdAt"] != comment["modifiedAt"]:
+                print("Modified by :", comment["modifiedBy"]["userName"])
+                print("Modified at :", comment["modifiedAt"])
+
             print()
 
 def get_user_decision(commentThreads):
