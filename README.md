@@ -118,7 +118,7 @@ Once the script is executed, it will request an input for the token to make requ
 
 ## Design helper
 
-The design_helpers.py script queries the workspaces available and gets the users choice of workspace, as well as querying the projects in the workspace and gets the users choice of project they want to use. 
+The design_helpers.py script queries the workspaces available and gets the user's choice of workspace, as well as querying the projects in the workspace and gets the user's choice of project they want to use. 
 
 This script cant be executed by itself as it holds only functions and queries. The purpose of this script is to be used as an addition to any script that queries the design API, as most scripts will need to get the workspace and project the user wants to use. 
 
@@ -143,7 +143,7 @@ If the user chose 3, they will be asked to enter the comment ID for the comment 
 
 ## Design components
 
-The project_design_components.py example uses multiple queries that takes a token input and returns all available workspaces, then takes the users choice of which workspace to use as an input and returns all projects in the workspace. It then takes the users input again for a choice of project and returns the first 25 components used for a project.
+The project_design_components.py example uses multiple queries that takes a token input and returns all available workspaces, then takes the user's choice of which workspace to use as an input and returns all projects in the workspace. It then takes the user's input again for a choice of project and returns the first 25 components used for a project.
 
 `python project_design_components.py`
 
@@ -170,11 +170,25 @@ When the script is executed, the user is asked for a token input. Then the user 
 
 ## Supply filter
 
-The supply_filter.py example quries the supply API for the first 10 parts which include the filter.
+The supply_filter.py example queries the supply API for the first 10 parts which include the filter.
 
 `python supply_filtering_and_sorting.py`
 
 When the script is executed, the user is asked for a token input. It will then ask the user to query the supply API by choosing either filter or by sort by entering the index value assigned to it. The attribute that is used for filtering or sorting will be the same and is declared as a global variable. This global variable can be changed for another filtering item.
 Next, the script runs a query to get the list of attributes that can be used for filtering or sorting and displays these to the user. If the user chose filtering, there is an additional option where they can enter their own value to search for. The user is prompted to choose one by providing the index. If the user chose to filter, they will be prompted to enter an attribute value to filter to. If the user then chose to enter their own value, they will be asked to enter their own value. If instead the user chose to sort, they will be prompted to choose a sort direction: ascending or descending.
-The script will run a second query to get the parts. If the user chose to filter, they will be filtered according to the provided attribute value, either pre determined values or the users own value. If the user chose to sort, the parts will be sorted according to the chosen sort direction. The query is limited to return 10 parts. The script will print out the amount of hits and, for each part, the part name, category, manufacturer, MPN, average number of parts available, description, median price, currency, and the names and values of attributes used for sorting or filtering.
+The script will run a second query to get the parts. If the user chose to filter, they will be filtered according to the provided attribute value, either pre determined values or the user's own value. If the user chose to sort, the parts will be sorted according to the chosen sort direction. The query is limited to return 10 parts. The script will print out the amount of hits and, for each part, the part name, category, manufacturer, MPN, average number of parts available, description, median price, currency, and the names and values of attributes used for sorting or filtering.
 The attribute used for filtering or sorting can be changed at the top of the script. In a real application, multiple filters can be used at once, and filtering can be combined with sorting.
+
+
+## Library components filtering
+
+The filtered_library_components_to_csv.py example queries the design API for components in a workspace and writes certain components to a CSV file, depending on the user's choice of filter.
+
+`python filtered_library_components_to_csv.py`
+
+When the script is executed, the user is asked to enter their client ID and client secret for the application they are using. It then will ask the user to enter the username and password they use for the Nexar Partner Portal or Altium 365. The client secret and password are sensitive information, so the script uses getpass.getpass which hides what the user is entering. It may look like the script does not let the user enter information, however, it is taking the user's input but not displaying it. It will then use these 4 inputs and obtain an access token. This access token is then used to query the design API and return components used in a workspace. The number of results can be quite large so by default, the limit of returned results is 10. The script then asks the user to input the index of what type of filter they want to apply to the returned components. 
+If the user chose 1, then no filter will be applied to the returned components, therefore it writes all of the components to a CSV file. Otherwise, if the user didn't choose 4, they are asked to enter the name of the parameter and the value of the parameter to filter for.
+If the user chose 2, the list of components will be filtered to only include those components where the component's parameter value is equal to the specified value.
+If the user chose 3, the list of components will be filtered to only include those components where the component's parameter value is not equal to the specified value.
+If the user chose 4, the list of components will be filtered to only include those components where the component's parameter value starts with the specified value.
+It will then write the returned part information to the CSV file called "library_components.csv". If this doesn't exist, it will create it. If the file already has information in it, the script will write over it.
