@@ -1,5 +1,7 @@
-from nexar_requests import NexarClient
-import sys, math
+import os
+import sys
+import math
+from nexarClients.supply.nexarSupplyClient import NexarClient
 
 NEXT_PAGE = "Next page"
 PREVIOUS_PAGE = "Previous page"
@@ -43,6 +45,7 @@ query Supply_Query($limit: Int!, $inStockOnly: Boolean!, $part: String, $start: 
 }
 '''
 
+
 def supsearch_query(nexar, limit, inStockOnly, part, start):
     variables = {
         "limit": limit,
@@ -54,24 +57,25 @@ def supsearch_query(nexar, limit, inStockOnly, part, start):
     partInformation = nexar.get_query(SUPPLY_QUERY, variables)["supSearchMpn"]
     return partInformation
 
+
 def list_supsearch_query(partInformation, page, numberOfPages):
     print()
-    
+
     if partInformation == []:
         print("No parts available...")
         sys.exit()
-    
+
     else:
         print("Page", page, "of", numberOfPages)
-        
-        if partInformation["results"] != None and partInformation["hits"] != 0:
+
+        if partInformation["results"] is not None and partInformation["hits"] != 0:
             print("There are currently", partInformation["hits"], "parts available...")
-            
+
             for part in partInformation["results"]:
                 print()
                 print("Part name :", part["part"]["name"])
-                
-                if part["part"]["category"] != None:
+
+                if part["part"]["category"] is not None:
                     print("Part category :", part["part"]["category"]["name"])
                 else:
                     print("No part category available")
@@ -80,17 +84,18 @@ def list_supsearch_query(partInformation, page, numberOfPages):
                 print("Part MPN :", part["part"]["mpn"])
                 print("Average number of parts available :", part["part"]["avgAvail"])
                 print("Description :", part["part"]["shortDescription"])
-                
-                if part["part"]["medianPrice1000"] != None:
+
+                if part["part"]["medianPrice1000"] is not None:
                     print("Part median price :", part["part"]["medianPrice1000"]["price"])
                     print("Currency :", part["part"]["medianPrice1000"]["currency"])
-                
+
                 else:
                     print("No pricing available...")
 
         else:
             print("No parts available... ")
     print()
+
 
 def get_page_decision_from_user():
     for index, item in enumerate(PAGE_OPTIONS):
@@ -103,30 +108,31 @@ def get_page_decision_from_user():
     if userPageDecision <= 0 or userPageDecision > len(PAGE_OPTIONS):
         print("\n" + "Invalid response, try again... " + "\n")
         return get_page_decision_from_user()
-    
+
     else:
         return PAGE_OPTIONS[userPageDecision - 1]
+
 
 def move_page(userDecision, numberOfPages, limit, inStockOnly, part, start, page):
     if userDecision == EXIT:
         print("Exiting system...")
         sys.exit()
-    
+
     elif userDecision == NEXT_PAGE:
-        
+
         if page != numberOfPages:
 
             page = page + 1
             start = start + limit
-            
+
             partInformation = supsearch_query(nexar, limit, inStockOnly, part, start)
             list_supsearch_query(partInformation, page, numberOfPages)
 
         else:
             print("\n" + "No next page available, try again..." + "\n")
-        
+
         return page, start
-    
+
     elif userDecision == PREVIOUS_PAGE:
 
         if page != 1:
@@ -139,19 +145,19 @@ def move_page(userDecision, numberOfPages, limit, inStockOnly, part, start, page
 
         else:
             print("\n" + "No previous page available, try again..." + "\n")
-            
+
         return page, start
-   
+
     elif userDecision == CHOOSE_PAGE:
         chosenPage = input("Enter page number... : ")
         chosenPage = int(chosenPage)
-        
+
         if chosenPage <= 0 or chosenPage > numberOfPages:
-            
+
             print()
             print("Invalid page number...")
             print()
-        
+
         else:
             page = chosenPage
             start = (chosenPage * limit) - limit
@@ -161,10 +167,13 @@ def move_page(userDecision, numberOfPages, limit, inStockOnly, part, start, page
 
         return page, start
 
+
 if __name__ == '__main__':
-    token = input("Enter token : ")
-    nexar = NexarClient(token)
-    
+
+    client_id = os.environ["NEXAR_CLIENT_ID"]
+    client_secret = os.environ["NEXAR_CLIENT_SECRET"]
+    nexar = NexarClient(client_id, client_secret)
+
     print()
     part = input("Enter part MPN... : ")
     start = 0

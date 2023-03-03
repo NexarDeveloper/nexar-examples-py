@@ -1,4 +1,4 @@
-from nexar_requests import NexarClient
+from .nexarDesignClient import NexarClient
 
 WORKSPACES_QUERY = '''
 query Workspaces {
@@ -27,6 +27,7 @@ def get_workspaces(nexar: NexarClient):
     workspaces = nexar.get_query(WORKSPACES_QUERY)["desWorkspaces"]
     return workspaces
 
+
 def get_workspace_id_from_user(workspaces: list):
     print("\n" + "List of available workspaces to visit..." + "\n")
 
@@ -42,12 +43,16 @@ def get_workspace_id_from_user(workspaces: list):
     else:
         return workspaces[chosenWorkspace-1]["id"]
 
+
 def get_projects(workspace_id: str, nexar: NexarClient):
     variables = {
         "workspaceId": workspace_id
     }
-    projects = nexar.get_query(WORKSPACEBYID_QUERY, variables)["desWorkspaceById"]["projects"]
+    projects = nexar.get_query(
+        WORKSPACEBYID_QUERY, variables
+    )["desWorkspaceById"]["projects"]
     return projects
+
 
 def get_project_id_from_user(projects: list):
     print("\n" + "List of available projects to visit..." + "\n")

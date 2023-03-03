@@ -1,6 +1,8 @@
-from nexar_requests import NexarClient
+# from nexar_requests import NexarClient
 import sys
-from design_helpers import (
+import os
+from nexarClients.design.nexarDesignClient import NexarClient
+from nexarClients.design.design_helpers import (
     get_workspaces,
     get_workspace_id_from_user,
     get_projects,
@@ -16,7 +18,9 @@ EXIT = "Exit"
 PAGE_OPTIONS = [NEXT_PAGE, PREVIOUS_PAGE, EXIT]
 
 GETCOMPONENTINFOFORPROJECT_QUERY = '''
-query GetComponentInfoForProject($projectId: ID!, $first: Int, $after: String, $last: Int, $before: String) {
+query GetComponentInfoForProject(
+    $projectId: ID!, $first: Int, $after: String, $last: Int, $before: String
+) {
     desProjectById(
         id: $projectId
     ) {
@@ -59,6 +63,8 @@ query GetComponentInfoForProject($projectId: ID!, $first: Int, $after: String, $
     }
 }
 '''
+
+
 def get_component_info_for_project(project_id, nexar, cursor, forwards):
     first = COMPONENT_COUNT if forwards else None
     last = None if forwards else COMPONENT_COUNT
@@ -72,12 +78,19 @@ def get_component_info_for_project(project_id, nexar, cursor, forwards):
         "before": endCursor
     }
 
-    componentInfoForProject = nexar.get_query(GETCOMPONENTINFOFORPROJECT_QUERY, variables)["desProjectById"]["design"]["workInProgress"]["variants"]
-    
-    newStartCursor = componentInfoForProject[0]["pcb"]["designItems"]["pageInfo"]["endCursor"]
-    newEndCursor = componentInfoForProject[0]["pcb"]["designItems"]["pageInfo"]["startCursor"]
-    
+    componentInfoForProject = nexar.get_query(
+        GETCOMPONENTINFOFORPROJECT_QUERY, variables
+    )["desProjectById"]["design"]["workInProgress"]["variants"]
+
+    newStartCursor = componentInfoForProject[
+        0
+    ]["pcb"]["designItems"]["pageInfo"]["endCursor"]
+    newEndCursor = componentInfoForProject[
+        0
+    ]["pcb"]["designItems"]["pageInfo"]["startCursor"]
+
     return componentInfoForProject, newStartCursor, newEndCursor
+
 
 def list_component_info_for_project(componentInfo, page):
     print()
@@ -93,7 +106,7 @@ def list_component_info_for_project(componentInfo, page):
         for designItem in componentInfo[0]["pcb"]["designItems"]["nodes"]:
             print("Designator :", designItem["designator"])
 
-            if designItem["component"] != None:
+            if designItem["component"] is not None:
                 print("Name :", designItem["component"]["name"])
 
                 if designItem["component"]["comment"] != "":
@@ -119,9 +132,10 @@ def list_component_info_for_project(componentInfo, page):
             else:
                 print("No component information is available...")
             print()
-  
+
         print("Has next page :", componentInfo[0]["pcb"]["designItems"]["pageInfo"]["hasNextPage"])
         print("Has previous page :", componentInfo[0]["pcb"]["designItems"]["pageInfo"]["hasPreviousPage"])
+
 
 def get_page_decision_from_user():
     print()
@@ -138,30 +152,31 @@ def get_page_decision_from_user():
     else:
         return PAGE_OPTIONS[userPageDecision - 1]
 
-def move_page(pageInfo, userPageDecision, project_id, nexar, startCursor, endCursor, page): 
-           
+
+def move_page(pageInfo, userPageDecision, project_id, nexar, startCursor, endCursor, page):
+
     if userPageDecision == EXIT:
         print("\n" + "Exiting system...")
         sys.exit()
 
     elif userPageDecision == NEXT_PAGE:
 
-        if pageInfo["hasNextPage"] == True:
-            
+        if pageInfo["hasNextPage"] is True:
+
             page = page + 1
 
             componentInfo, startCursor, endCursor = get_component_info_for_project(project_id, nexar, startCursor, True)
             pageInfo = componentInfo[0]["pcb"]["designItems"]["pageInfo"]
             list_component_info_for_project(componentInfo, page)
-            
+
         else:
             print("\n" + "No next page available, try again...")
 
-        return  startCursor, endCursor, pageInfo
+        return startCursor, endCursor, pageInfo
 
     elif userPageDecision == PREVIOUS_PAGE:
 
-        if pageInfo["hasPreviousPage"] == True:
+        if pageInfo["hasPreviousPage"] is True:
 
             page = page - 1
 
@@ -176,8 +191,10 @@ def move_page(pageInfo, userPageDecision, project_id, nexar, startCursor, endCur
 
 
 if __name__ == '__main__':
-    token = input("Enter token : ")
-    nexar = NexarClient(token)
+
+    clientId = os.environ["NEXAR_CLIENT_ID"]
+    clientSecret = os.environ["NEXAR_CLIENT_SECRET"]
+    nexar = NexarClient(clientId, clientSecret, ["design.domain", "user.access", "offline_access"])
 
     workspaces = get_workspaces(nexar)
     workspace_id = get_workspace_id_from_user(workspaces)
@@ -193,4 +210,6 @@ if __name__ == '__main__':
 
     while True:
         userPageDecision = get_page_decision_from_user()
-        startCursor, endCursor, pageInfo = move_page(pageInfo, userPageDecision, project_id, nexar, startCursor, endCursor, page) 
+        startCursor, endCursor, pageInfo = move_page(
+            pageInfo, userPageDecision, project_id, nexar, startCursor, endCursor, page
+        )

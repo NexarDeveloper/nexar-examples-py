@@ -1,5 +1,7 @@
-from nexar_requests import NexarClient
-import csv, getpass, requests
+from nexarClients.design.nexarDesignClient import NexarClient
+import os
+import csv
+
 
 TOKEN_URL = "https://identity.nexar.com/connect/token"
 
@@ -17,7 +19,7 @@ query GetLibrary($workspaceUrl : String!) {
     ) {
         components{
             nodes{
-                id  
+                id
                 name
                 description
                 comment
@@ -38,6 +40,7 @@ query GetLibrary($workspaceUrl : String!) {
     }
 }
 '''
+
 
 def get_user_decision():
 
@@ -128,7 +131,8 @@ def apply_filter3(libraryComponents, filterName, filterValue, parts):
 
             parameter = next(iter(parameterList))
 
-            if parameter["value"].lower().startswith(filterValue.lower()):  # checks if parameter value starts with inputted value
+            # checks if parameter value starts with inputted value
+            if parameter["value"].lower().startswith(filterValue.lower()):
                 parts.append(component)
 
     if parts == []:
@@ -168,18 +172,18 @@ def convert_to_csv_format(component, parameterIndex, manufacturerIndex):
         component["companyName"] = component["manufacturerParts"][manufacturerIndex]["companyName"]
         component["partNumber"] = component["manufacturerParts"][manufacturerIndex]["partNumber"]
         component["priority"] = component["manufacturerParts"][manufacturerIndex]["priority"]
-            
+
     else:
         component["companyName"] = None
         component["partNumber"] = None
         component["priority"] = None
 
-    if component["details"]["parameters"] != None:
+    if component["details"]["parameters"] is not None:
 
         component["parametersName"] = component["details"]["parameters"][parameterIndex]["name"]
         component["value"] = component["details"]["parameters"][parameterIndex]["value"]
         component["type"] = component["details"]["parameters"][parameterIndex]["type"]
-        
+
     else:
         component["parametersName"] = None
         component["value"] = None
@@ -188,37 +192,12 @@ def convert_to_csv_format(component, parameterIndex, manufacturerIndex):
     return component
 
 
-def get_access_token(client_id, client_secret):
-
-    if not client_id or not client_secret:
-        raise Exception("client_id and/or client_secret are empty")
-
-    username = input("Enter username: ")
-    password = getpass.getpass("Enter password: ")
-
-    token = {}
-    token = requests.post(
-        url=TOKEN_URL,
-        data={
-            "grant_type": "password",
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "username": username,
-            "password": password,
-        },
-    ).json()
-
-    return token
-
-
 if __name__ == '__main__':
 
-    client_id = input("Enter client ID... : ")
-    client_secret = getpass.getpass("Enter client secret... :")
+    client_id = os.environ["NEXAR_CLIENT_ID"]
+    client_secret = os.environ["NEXAR_CLIENT_SECRET"]
 
-    token = get_access_token(client_id, client_secret)
-    
-    nexar = NexarClient(token["access_token"])
+    nexar = NexarClient(client_id, client_secret, ["design.domain", "user.access", "offline_access"])
 
     workspaceUrl = input("\n" + "Enter your workspace URL... : ")
 
@@ -235,7 +214,7 @@ if __name__ == '__main__':
 
         with open('library_components.csv', 'w', newline="") as componentsCsv:
 
-            writer = csv.DictWriter(componentsCsv, fieldnames = [
+            writer = csv.DictWriter(componentsCsv, fieldnames=[
                 "id",
                 "name",
                 "description",
@@ -245,7 +224,7 @@ if __name__ == '__main__':
                 "priority",
                 "parametersName",
                 "value",
-                "type"],extrasaction= 'ignore')
+                "type"], extrasaction='ignore')
 
             writer.writeheader()
             writer.writerows(parts)

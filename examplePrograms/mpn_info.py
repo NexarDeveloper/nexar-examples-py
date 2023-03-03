@@ -1,6 +1,8 @@
 """Example request for extracting GraphQL part data."""
-import sys, argparse, json
-from nexar_requests import NexarClient
+import sys
+import os
+import json
+from nexarClients.supply.nexarSupplyClient import NexarClient
 
 QUERY_MPN = """
 query ($mpn: String!) {
@@ -37,16 +39,17 @@ query ($mpn: String!) {
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description="Request part information based on a maunfacturer part number (MPN)."
-    )
-    parser.add_argument("mpn", help="The mpn for the part request.", type=str)
-    parser.add_argument("-token", "-t", help="The Nexar access token.", type=str)
-    args = parser.parse_args()
-    nexar = NexarClient(args.token if (args.token is not None) else sys.stdin.readline().strip())
+
+    client_id = os.environ["NEXAR_CLIENT_ID"]
+    client_secret = os.environ["NEXAR_CLIENT_SECRET"]
+    nexar = NexarClient(client_id, client_secret)
+
+    mpn = input("Enter a MPN: ")
+    if not mpn:
+        sys.exit()
 
     variables = {
-        "mpn": args.mpn
+        "mpn": mpn
     }
     data = nexar.get_query(QUERY_MPN, variables)
-    print(json.dumps(data["supSearchMpn"], indent = 1))
+    print(json.dumps(data["supSearchMpn"], indent=1))

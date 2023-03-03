@@ -1,7 +1,8 @@
 """Example workflow launch with attached files."""
-import sys, time
-import argparse, json
-from nexar_requests import NexarClient
+import os
+import time
+import json
+from nexarClients.design.nexarDesignClient import NexarClient
 
 WORKFLOW_VARIABLES = """
 query Workflow($workspace: String!) {
@@ -28,16 +29,19 @@ mutation Workflow($workspace: String!, $workflowDefinition: String!, $variables:
   }
 }"""
 
+
 def find_workflow(workspace):
-    for var in workspace["workflowDefinitions"]: print(var["name"]) 
+    for var in workspace["workflowDefinitions"]:
+        print(var["name"])
     workflowName = input("Enter workflow name: ")
 
     workflow = next((p for p in workspace["workflowDefinitions"] if (p["name"] == workflowName)), None)
     if (workflow is None):
         print("No workflow found with that name")
         raise SystemExit
-    
+
     return workflow
+
 
 def get_workflow_values(workspace, workflow):
     values = []
@@ -48,7 +52,7 @@ def get_workflow_values(workspace, workflow):
             upload = [
                 nexar.upload_file(
                     workspace["url"],
-                    path.strip(), 
+                    path.strip(),
                     container
                 ) for path in values[-1]["value"].split(",")
             ]
@@ -56,25 +60,27 @@ def get_workflow_values(workspace, workflow):
 
     return values
 
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-      description="Launch a workflow within a workspace. Interacctive prompts for the workflow name and input values."
-    )
-    parser.add_argument("name", help="The name for the workspace to query.", type=str)
-    parser.add_argument("-token", "-t", help="The Nexar access token.", type=str)
-    args = parser.parse_args()
-    nexar = NexarClient(args.token if (args.token is not None) else sys.stdin.readline().strip())
+
+    client_id = os.environ["NEXAR_CLIENT_ID"]
+    client_secret = os.environ["NEXAR_CLIENT_SECRET"]
+    nexar = NexarClient(client_id, client_secret, ["design.domain", "user.access", "offline_access"])
+
+    workspaceName = input("\n" + "Enter your workspace name: ")
 
     variables = {
-        "workspace": args.name
+        "workspace": workspaceName
     }
+
+    print(nexar.get_query(WORKFLOW_VARIABLES, variables))
     workspace = nexar.get_query(WORKFLOW_VARIABLES, variables)["desWorkspaces"][0]
     workflow = find_workflow(workspace)
-        
+
     variables = {
         "workspace": workspace["url"],
         "workflowDefinition": workflow["workflowDefinitionId"],
         "variables": get_workflow_values(workspace, workflow)
     }
     workflow = nexar.get_query(WORKFLOW_LAUNCH, variables)
-    print(json.dumps(workflow["desLaunchWorkflow"], indent = 1))
+    print(json.dumps(workflow["desLaunchWorkflow"], indent=1))

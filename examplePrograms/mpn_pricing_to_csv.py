@@ -1,8 +1,9 @@
 """Example request for extracting GraphQL part data."""
-import sys, argparse, json
+import sys
+import os
 import csv
 from typing import List
-from nexar_requests import NexarClient
+from nexarClients.supply.nexarSupplyClient import NexarClient
 
 QUERY_MPN = """
 query ($queries: [SupPartMatchQuery!]!) {
@@ -32,23 +33,25 @@ query ($queries: [SupPartMatchQuery!]!) {
           }
         }
       }
-    }  
+    }
   }
 }
 """
-PRICEPOINTS = [1,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000]
+PRICEPOINTS = [1, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000]
 
 
 def get_seller_pricing(part, quantities) -> List:
     offers = []
     for seller in part["sellers"]:
         for offer in seller["offers"]:
-            if (not len(offer["prices"])): continue
+            if (not len(offer["prices"])):
+                continue
 
             prices = sorted(offer.pop("prices"), key=lambda o: o["quantity"])
             nextPrice = prices.pop(0)
             for q in quantities:
-                while (len(prices) and prices[0]["quantity"]< q): nextPrice = prices.pop(0)
+                while (len(prices) and prices[0]["quantity"] < q):
+                    nextPrice = prices.pop(0)
                 offer[q] = nextPrice["price"]
 
         # add info to the first offer from this seller
@@ -67,16 +70,22 @@ def get_seller_pricing(part, quantities) -> List:
     })
     return offers
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-      description="Query multiple MPNs to produce a pricing table (output in .csv format)."
-    )
-    parser.add_argument("mpn", help="The mpn for the part request.", nargs="+", type=str)
-    parser.add_argument("-token", "-t", help="The Nexar access token.", type=str)
-    args = parser.parse_args()
-    nexar = NexarClient(args.token if (args.token is not None) else sys.stdin.readline().strip())
 
-    variables = {"queries": [{"mpn": mpn, "limit": 1, "start": 0} for mpn in args.mpn]}
+if __name__ == '__main__':
+
+    client_id = os.environ["NEXAR_CLIENT_ID"]
+    client_secret = os.environ["NEXAR_CLIENT_SECRET"]
+    nexar = NexarClient(client_id, client_secret)
+
+    mpns = []
+    while True:
+        mpn = input("Enter an mpn: ")
+        mpns += [mpn]
+        response = input("Enter another mpn? (y/n): ")
+        if response.lower() == "n":
+            break
+
+    variables = {"queries": [{"mpn": mpn, "limit": 1, "start": 0} for mpn in mpns]}
     data = nexar.get_query(QUERY_MPN, variables)
 
     parts = []
@@ -85,7 +94,7 @@ if __name__ == '__main__':
             offers = get_seller_pricing(part, PRICEPOINTS)
             parts = parts + offers
 
-    writer = csv.DictWriter(sys.stdout, fieldnames = [
+    writer = csv.DictWriter(sys.stdout, fieldnames=[
       "mpn",
       "name",
       "id",
@@ -97,8 +106,8 @@ if __name__ == '__main__':
       "moq",
       "packaging",
       "sku",
-      "updated"] + 
+      "updated"] +
       PRICEPOINTS, extrasaction='ignore')
-        
-    writer.writeheader() 
-    writer.writerows(parts) 
+
+    writer.writeheader()
+    writer.writerows(parts)
