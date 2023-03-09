@@ -147,3 +147,11 @@ If the user chose 2, the list of components will be filtered to only include tho
 If the user chose 3, the list of components will be filtered to only include those components where the component's parameter value is not equal to the specified value.
 If the user chose 4, the list of components will be filtered to only include those components where the component's parameter value starts with the specified value.
 It will then write the returned part information to the CSV file called "library_components.csv". If this doesn't exist, it will create it. If the file already has information in it, the script will write over it.
+
+## Library Components Part Choices Export
+
+This example queries the design API for components in a workspace and their part choices. This data is then returned in the form of a json file.
+
+`python library_part_choices_export.py`
+
+To use this example, Nexar client ID and secret should be set as environment variables and your Altium 365 workspace URL should be pasted into the script where labelled "Your workspace URL here". Alternatively, you could change how these are inputted by hardcoding in your client ID and secret or also setting your workspace URL as an environment variable. However, be careful to not share your client credentials. You can also adapt the string query at the top of the script if you wish to change the data that is returned.

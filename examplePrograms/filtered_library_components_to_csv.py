@@ -2,9 +2,6 @@ from nexarClients.design.nexarDesignClient import NexarClient
 import os
 import csv
 
-
-TOKEN_URL = "https://identity.nexar.com/connect/token"
-
 FILTER1 = "Filter by inputted parameter equal to inputted value"
 FILTER2 = "Filter by inputted parameter not equal to inputted value"
 FILTER3 = "Filter by inputted parameter that starts with inputted value"
