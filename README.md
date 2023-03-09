@@ -4,7 +4,7 @@ Various example Nexar queries to use as inspiration for developing custom partne
 
 ## Prerequisites
 
-Before using any of these examples you will need to have a Nexar account, if you don't you can sign up at [Nexar](www.nexar.com).
+Before using any of these examples you will need to have a Nexar account, if you don't you can sign up at [Nexar](https://www.nexar.com).
 
 For the supply data queries, you will need to have a Nexar application with the supply scope.
 
