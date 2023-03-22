@@ -1,4 +1,4 @@
-tokenCache.json
+*.json
 __pycache__
-library_components.csv
+*.csv
 .vscode
