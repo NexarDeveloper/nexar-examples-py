@@ -7,7 +7,7 @@ import csv
 # We recommend building queries in an IDE such as BananaCakePop or Postman.
 # You can use BananaCakePop in a browser here: https://api.nexar.com/graphql/
 
-workspaceURL = "https://altium-inc-2784.365.altium.com/"
+workspaceURL = "Your workspace URL here"
 
 graphql_query = '''query library ($workspaceURL: String!, $after: String) {
   desLibrary (workspaceUrl: $workspaceURL) {
